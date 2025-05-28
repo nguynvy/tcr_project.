@@ -8,7 +8,10 @@ import (
 	"net"
 	"strings"
 	"sync"
+<<<<<<< HEAD
 	"time"
+=======
+>>>>>>> e8c0da7472230305177b165cb53057084c3b2787
 
 	"tcr_project/auth"
 )
@@ -55,7 +58,10 @@ type PlayerState struct {
 type GameState struct {
 	P1, P2 PlayerState
 	P1Turn bool
+<<<<<<< HEAD
 	Over   bool
+=======
+>>>>>>> e8c0da7472230305177b165cb53057084c3b2787
 }
 
 func main() {
@@ -169,6 +175,7 @@ func startMatch(p1Conn, p2Conn PlayerConn) {
 		P1Turn: true,
 	}
 
+<<<<<<< HEAD
 	go startManaRegen(&game.P1, &game)
 	go startManaRegen(&game.P2, &game)
 
@@ -214,11 +221,16 @@ func startTimer(game *GameState) {
 	}
 	fmt.Fprintln(game.P1.Conn, "Gõ 'replay' để chơi lại hoặc 'quit' để thoát.")
 	fmt.Fprintln(game.P2.Conn, "Gõ 'replay' để chơi lại hoặc 'quit' để thoát.")
+=======
+	go handlePlayer(&game, p1)
+	go handlePlayer(&game, p2)
+>>>>>>> e8c0da7472230305177b165cb53057084c3b2787
 }
 
 func handlePlayer(game *GameState, player PlayerState) {
 	reader := bufio.NewReader(player.Conn)
 	for {
+<<<<<<< HEAD
 		// Nếu game đã kết thúc, chờ người chơi nhập replay hoặc quit
 		if game.Over {
 			fmt.Fprint(player.Conn, "🔚 Trận đấu đã kết thúc. Gõ `replay` để chơi lại hoặc `quit` để thoát:\n")
@@ -255,21 +267,32 @@ func handlePlayer(game *GameState, player PlayerState) {
 		}
 
 		// Xử lý lệnh khi trận chưa kết thúc
+=======
+>>>>>>> e8c0da7472230305177b165cb53057084c3b2787
 		line, err := reader.ReadString('\n')
 		if err != nil {
 			fmt.Println("Ngắt kết nối người chơi", player.Username)
 			return
 		}
 		line = strings.TrimSpace(line)
+<<<<<<< HEAD
 
 		if !game.isPlayerTurn(player.Username) {
 			fmt.Fprintln(player.Conn, "❌ Chưa đến lượt bạn!")
+=======
+		if !game.isPlayerTurn(player.Username) {
+			fmt.Fprintln(player.Conn, "Chưa đến lượt bạn!")
+>>>>>>> e8c0da7472230305177b165cb53057084c3b2787
 			continue
 		}
 
 		valid := game.processCommand(player.Username, line)
 		if !valid {
+<<<<<<< HEAD
 			fmt.Fprintln(player.Conn, "⚠️ Lệnh không hợp lệ, vui lòng nhập lại.")
+=======
+			fmt.Fprintln(player.Conn, "Lệnh không hợp lệ, vui lòng nhập lại.")
+>>>>>>> e8c0da7472230305177b165cb53057084c3b2787
 		}
 	}
 }
@@ -296,6 +319,7 @@ func (g *GameState) getOpponentState(username string) *PlayerState {
 }
 
 func (g *GameState) processCommand(username string, cmd string) bool {
+<<<<<<< HEAD
 	cmd = strings.ToLower(strings.TrimSpace(cmd))
 	attacker := g.getPlayerState(username)
 	defender := g.getOpponentState(username)
@@ -316,6 +340,23 @@ func (g *GameState) processCommand(username string, cmd string) bool {
 		troop, ok := AllTroops[troopName]
 		if !ok {
 			fmt.Fprintln(attacker.Conn, "Không tồn tại troop tên này!")
+=======
+	cmd = strings.ToLower(cmd)
+	attacker := g.getPlayerState(username)
+	defender := g.getOpponentState(username)
+
+	switch {
+	case strings.HasPrefix(cmd, "summon"):
+		parts := strings.Split(cmd, " ")
+		if len(parts) != 2 {
+			fmt.Fprintln(attacker.Conn, "Cú pháp: summon <pawn/bishop/...>")
+			return true
+		}
+		troopName := strings.ToLower(parts[1])
+		troop, ok := AllTroops[troopName]
+		if !ok {
+			fmt.Fprintln(attacker.Conn, "Không có troop tên này!")
+>>>>>>> e8c0da7472230305177b165cb53057084c3b2787
 			return true
 		}
 		if attacker.Mana < troop.MANA {
@@ -324,43 +365,72 @@ func (g *GameState) processCommand(username string, cmd string) bool {
 		}
 		attacker.Mana -= troop.MANA
 		attacker.Troops = append(attacker.Troops, troop)
+<<<<<<< HEAD
 		fmt.Fprintf(attacker.Conn, "✅ Triệu hồi %s thành công! Mana còn lại: %d\n", troop.Name, attacker.Mana)
+=======
+		fmt.Fprintf(attacker.Conn, "Triệu hồi %s thành công! Mana còn lại: %d\n", troop.Name, attacker.Mana)
+>>>>>>> e8c0da7472230305177b165cb53057084c3b2787
 		return true
 
 	case strings.HasPrefix(cmd, "attack"):
 		if len(attacker.Troops) == 0 {
+<<<<<<< HEAD
 			fmt.Fprintln(attacker.Conn, "⚠️ Bạn chưa có troop nào! Dùng: summon <pawn/rook/...>")
 			return true
 		}
 		parts := strings.Fields(cmd)
 		if len(parts) != 2 {
 			fmt.Fprintln(attacker.Conn, "Cú pháp đúng: attack g1 / g2 / king")
+=======
+			fmt.Fprintln(attacker.Conn, "Bạn chưa có troop nào! Dùng: summon <pawn/rook/...>")
+			return true
+		}
+		parts := strings.Split(cmd, " ")
+		if len(parts) != 2 {
+			fmt.Fprintln(attacker.Conn, "Sai cú pháp. Dùng: attack g1 / g2 / king")
+>>>>>>> e8c0da7472230305177b165cb53057084c3b2787
 			return true
 		}
 		target := parts[1]
 		var tower *Tower
 		var towerName string
+<<<<<<< HEAD
 
+=======
+>>>>>>> e8c0da7472230305177b165cb53057084c3b2787
 		switch target {
 		case "g1":
 			tower = &defender.Guard1
 			towerName = "Guard Tower 1"
 		case "g2":
 			if defender.Guard1.HP > 0 {
+<<<<<<< HEAD
 				fmt.Fprintln(attacker.Conn, "⚠️ Phải phá Guard Tower 1 trước khi tấn công Guard Tower 2!")
+=======
+				fmt.Fprintln(attacker.Conn, "Bạn phải phá Guard Tower 1 trước!")
+>>>>>>> e8c0da7472230305177b165cb53057084c3b2787
 				return true
 			}
 			tower = &defender.Guard2
 			towerName = "Guard Tower 2"
 		case "king":
+<<<<<<< HEAD
 			if defender.Guard1.HP > 0 || defender.Guard2.HP > 0 {
 				fmt.Fprintln(attacker.Conn, "⚠️ Phải phá cả Guard Tower 1 và 2 trước khi tấn công King Tower!")
+=======
+			if defender.Guard1.HP > 0 {
+				fmt.Fprintln(attacker.Conn, "Bạn phải phá Guard Tower 1 trước!")
+>>>>>>> e8c0da7472230305177b165cb53057084c3b2787
 				return true
 			}
 			tower = &defender.KingTower
 			towerName = "King Tower"
 		default:
+<<<<<<< HEAD
 			fmt.Fprintln(attacker.Conn, "⚠️ Mục tiêu không hợp lệ! Dùng: g1, g2, king")
+=======
+			fmt.Fprintln(attacker.Conn, "Mục tiêu không hợp lệ! Dùng: g1, g2, king")
+>>>>>>> e8c0da7472230305177b165cb53057084c3b2787
 			return true
 		}
 
@@ -374,6 +444,7 @@ func (g *GameState) processCommand(username string, cmd string) bool {
 			tower.HP = 0
 		}
 		attacker.Troops = attacker.Troops[1:]
+<<<<<<< HEAD
 
 		fmt.Fprintf(attacker.Conn, "⚔️ %s tấn công %s, gây %d sát thương! HP còn lại: %d\n", troop.Name, towerName, damage, tower.HP)
 		fmt.Fprintf(defender.Conn, "💢 %s dùng %s tấn công %s của bạn! HP còn lại: %d\n", attacker.Username, troop.Name, towerName, tower.HP)
@@ -381,39 +452,72 @@ func (g *GameState) processCommand(username string, cmd string) bool {
 		if target == "king" && tower.HP <= 0 {
 			fmt.Fprintln(attacker.Conn, "🏆 Bạn đã phá hủy King Tower và giành chiến thắng!")
 			fmt.Fprintln(defender.Conn, "💀 King Tower của bạn đã bị phá! Bạn đã thua trận!")
+=======
+		fmt.Fprintf(attacker.Conn, "Troop %s tấn công %s và gây %d sát thương! (Còn %d HP)\n", troop.Name, towerName, damage, tower.HP)
+		fmt.Fprintf(defender.Conn, "%s dùng troop %s tấn công %s của bạn! (Còn %d HP)\n", attacker.Username, troop.Name, towerName, tower.HP)
+
+		if target == "king" && tower.HP <= 0 {
+			fmt.Fprintln(attacker.Conn, "🏆 Bạn đã phá King Tower! Bạn thắng!")
+			fmt.Fprintln(defender.Conn, "💥 King Tower bạn bị phá! Bạn thua!")
+>>>>>>> e8c0da7472230305177b165cb53057084c3b2787
 			return true
 		}
 
 		g.P1Turn = !g.P1Turn
+<<<<<<< HEAD
 		fmt.Fprintln(g.P1.Conn, "🔄 Lượt tiếp theo.")
 		fmt.Fprintln(g.P2.Conn, "🔄 Lượt tiếp theo.")
+=======
+		fmt.Fprintln(g.P1.Conn, "Lượt tiếp theo.")
+		fmt.Fprintln(g.P2.Conn, "Lượt tiếp theo.")
+>>>>>>> e8c0da7472230305177b165cb53057084c3b2787
 		return true
 
 	case cmd == "defend":
 		attacker.KingTower.HP += 50
+<<<<<<< HEAD
 		fmt.Fprintf(attacker.Conn, "🛡️ Bạn đã phòng thủ! HP King Tower tăng lên: %d\n", attacker.KingTower.HP)
 		g.P1Turn = !g.P1Turn
 		fmt.Fprintln(g.P1.Conn, "🔄 Lượt tiếp theo.")
 		fmt.Fprintln(g.P2.Conn, "🔄 Lượt tiếp theo.")
+=======
+		fmt.Fprintf(attacker.Conn, "Bạn phòng thủ thành công! HP King Tower còn: %d\n", attacker.KingTower.HP)
+		g.P1Turn = !g.P1Turn
+		fmt.Fprintln(g.P1.Conn, "Lượt tiếp theo.")
+		fmt.Fprintln(g.P2.Conn, "Lượt tiếp theo.")
+>>>>>>> e8c0da7472230305177b165cb53057084c3b2787
 		return true
 
 	case cmd == "skill":
 		attacker.KingTower.HP += 100
+<<<<<<< HEAD
 		fmt.Fprintf(attacker.Conn, "✨ Bạn dùng kỹ năng đặc biệt! HP King Tower tăng lên: %d\n", attacker.KingTower.HP)
 		g.P1Turn = !g.P1Turn
 		fmt.Fprintln(g.P1.Conn, "🔄 Lượt tiếp theo.")
 		fmt.Fprintln(g.P2.Conn, "🔄 Lượt tiếp theo.")
+=======
+		fmt.Fprintf(attacker.Conn, "Bạn sử dụng skill! HP King Tower còn: %d\n", attacker.KingTower.HP)
+		g.P1Turn = !g.P1Turn
+		fmt.Fprintln(g.P1.Conn, "Lượt tiếp theo.")
+		fmt.Fprintln(g.P2.Conn, "Lượt tiếp theo.")
+>>>>>>> e8c0da7472230305177b165cb53057084c3b2787
 		return true
 
 	case cmd == "end":
 		g.P1Turn = !g.P1Turn
+<<<<<<< HEAD
 		fmt.Fprintln(g.P1.Conn, "🔄 Lượt tiếp theo.")
 		fmt.Fprintln(g.P2.Conn, "🔄 Lượt tiếp theo.")
+=======
+		fmt.Fprintln(g.P1.Conn, "Lượt tiếp theo.")
+		fmt.Fprintln(g.P2.Conn, "Lượt tiếp theo.")
+>>>>>>> e8c0da7472230305177b165cb53057084c3b2787
 		return true
 
 	case cmd == "help":
 		helpMsg := `
 [ Hướng dẫn lệnh trong game ]
+<<<<<<< HEAD
 🔹 summon <tên quân>        : Gọi troop (pawn, rook,...)
 🔹 attack g1/g2/king        : Tấn công tower đối thủ
 🔹 defend                   : Hồi 50 HP King Tower
@@ -443,3 +547,16 @@ func startManaRegen(player *PlayerState, game *GameState) {
 		<-ticker.C
 	}
 }
+=======
+ - summon <tên quân>        : Gọi troop (pawn, rook,...)
+ - attack g1/g2/king        : Tấn công tower đối thủ
+ - defend                   : Hồi 50 HP King Tower
+ - skill                    : Hồi 100 HP King Tower
+ - end                      : Kết thúc lượt
+ - help                     : Hiển thị hướng dẫn`
+		fmt.Fprintln(attacker.Conn, helpMsg)
+		return true
+	}
+	return false
+}
+>>>>>>> e8c0da7472230305177b165cb53057084c3b2787
